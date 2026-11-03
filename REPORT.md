@@ -14,7 +14,7 @@ HOW TO USE THIS SKELETON
 - Use only numbers from our own results/*.csv files. Never estimate or make up a result.
 - Testing doesn't prove correctness. Say tests "agreed on all N tested inputs", and use the
   correctness arguments for the general claim.
-- The Contribution Statement (end of this file) and docs/ai_use.md are separate deliverables,
+- The Contribution Statement (end of this file) and AI_USE.md are separate deliverables,
   so they don't count toward the page limit.
 -->
 
@@ -219,4 +219,4 @@ _Separate deliverable; doesn't count toward the page limit._
 
 ## AI Use Statement
 
-See [`docs/ai_use.md`](docs/ai_use.md). _Paste the final version here, or submit it alongside the report, whichever the course expects._
+See [`AI_USE.md`](AI_USE.md). _Paste the final version here, or submit it alongside the report, whichever the course expects._

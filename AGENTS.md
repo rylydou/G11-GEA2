@@ -50,4 +50,4 @@ Unfinished stubs raise `NotImplementedError("P#: name")` and their tests fail. T
   discussing with its owner.
 - Testing doesn't prove correctness. Don't write claims like that into the report or comments.
 - AI use must be disclosed. When you generate code or text, tell the user so they can add a row to
-  `docs/ai_use.md` and verify it independently.
+  `AI_USE.md` and verify it independently.

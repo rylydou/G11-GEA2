@@ -1,41 +1,84 @@
 # Team Plan: GEA2
 
-See `overview.md` for the full assignment summary. This doc covers **who does what**.
+`overview.md` covers what the assignment asks for; this doc covers **who does what**.
+Claim a role by adding your name, and check off tasks as you finish them. Post in the group chat
+when something another person is waiting on is ready.
 
-**How to use:** Put your name in a role, check off tasks as you finish them, and post in the group chat when something someone else needs is ready.
+**Only edit files you own** (all in `src/`). If you need a change in someone else's file, ask them.
+Fill in the `TODO(P#)` stubs, then make your tests pass. Tasks starting with **Wait on:** need someone else's work first.
 
-## Roles
+## P1: Inversions · Name: _________
 
-| Role | Name | What you do | Depends on | You deliver |
-|---|---|---|---|---|
-| **P1: Inversions** | _________ | Write the brute-force counter and the mergesort counter. Validate them against each other: 10+ hand arrays and 200+ random arrays. Write the correctness explanation and complexity analysis. | Nobody | Both counters, validation tests, report section for Part 1A and the Part 1B validation |
-| **P2: Recursive Coin Solvers** | _________ | Write the greedy, naive recursion, and memoized DP solvers, with counters for calls, distinct states, and cache hits. Run Exp 1 (repeated subproblems). Write the complexity analysis for these 3 solvers. | Nobody | 3 solvers, Exp 1 script, CSV, and table/plot, report section for 2A (these solvers) and 2C Exp 1 |
-| **P3: Bottom-Up DP + Timing** | _________ | Write the bottom-up DP and its complexity analysis. Benchmark both inversion counters and find the crossover point. Run Exp 2 (pseudo-polynomial scaling). Write the README. | **P1** (counters for the benchmark) | Bottom-up solver, benchmark and Exp 2 scripts, CSVs, and plots, report section for 2A (bottom-up), the 1B runtime results, and 2C Exp 2, README |
-| **P4: Coin Checker + Integrator** | _________ | Write the solution validator and the shared coin test cases. Cross-check the exact solvers: 10+ hand cases and 100+ random cases. Build the greedy counterexample search, find 3+ failures, and explain one. Merge the final report. | **P2** (greedy, naive, memo) and **P3** (bottom-up) | Validator, coin test cases, validation tests, counterexample search and results, report section for 2B, final merged report |
+Write both inversion counters and check them against each other. Then explain why the fast one
+is correct and how fast each one is.
 
-## Before Anyone Starts (Whole Team)
+**Owns:** `inversions.py`, `test_inversions.py`
+**Waits on:** nobody
 
-The code scaffold is already in the repo, in `src/`. Setup steps are in `README.md`.
+- [ ] `brute_force` and `sort_and_count` (returns the sorted array and the count)
+- [ ] 10+ hand-checked arrays, and 200+ random cross-checks pass
+- [ ] Report 2.1–2.4: algorithms, correctness, complexity, validation (Table 1)
+- [ ] Reflection Q1 and Q3
 
-- [ ] Everyone runs `pip install -r requirements.txt`, then `pytest` (unfinished parts fail with `NotImplementedError`)
-- [ ] Read the comment at the top of `src/helpers.py` (coin result format and `stats` counters)
-- [ ] Random-seed rule: use `random.Random(SEED)` (`SEED` is in `helpers.py`), never the global `random`
+## P2: Recursive Coin Solvers · Name: _________
 
-### Your Files (all in `src/`)
+Write the greedy, naive recursive, and memoized coin solvers, including call counters. Then run
+Experiment 1 to show how much repeated work memoization saves.
 
-**Only edit files you own.** Fill in the `TODO(P#)` stubs, then make your tests pass. If you need a change in someone else's file, ask them.
+**Owns:** `greedy.py`, `recursive.py`, `test_greedy.py`, `test_recursive.py`, `exp1_repeated_subproblems.py`
+**Waits on:** nobody
 
-| Role | Code | Tests | Experiment script |
-|---|---|---|---|
-| P1 | `inversions.py` | `test_inversions.py` | none |
-| P2 | `greedy.py`, `recursive.py` (naive + memo) | `test_greedy.py`, `test_recursive.py` | `exp1_repeated_subproblems.py` |
-| P3 | `bottom_up.py` | `test_bottom_up.py` | `benchmark_inversions.py`, `exp2_pseudo_polynomial.py` |
-| P4 | `validate.py`, `coin_cases.py` (shared test cases) | `test_validate.py` | `counterexamples.py` |
-| Shared | `helpers.py`: already finished (seeds, random inputs, `time_median`, `save_csv`, `IMPOSSIBLE`, `new_stats`). Ask the team before changing it. | | |
+- [ ] `greedy`, `naive`, and `memo` (with reconstruction of the coin list)
+- [ ] Counters: calls, distinct states, cache hits
+- [ ] Exp 1 run (CSV + plot), with the safety cutoff documented
+- [ ] Report 3.1 and 3.2 (greedy, naive, memo), and 3.5: Exp 1
+- [ ] Reflection Q4
 
-P2 and P3 tests read the hand cases from P4's `coin_cases.py`, but never edit it.
+## P3: Bottom-Up DP + Timing · Name: _________
 
-### Shared Function Signatures
+Write the bottom-up coin solver. Then do all the timing: the inversion benchmark and Experiment 2.
+Also own the README.
+
+**Owns:** `bottom_up.py`, `test_bottom_up.py`, `benchmark_inversions.py`, `exp2_pseudo_polynomial.py`, `README.md`
+**Waits on:** P1 (`brute_force`, `sort_and_count`), but only for the benchmark
+
+- [ ] `bottom_up` (with reconstruction and the `states_processed` counter)
+- [ ] Exp 2 run (A = 2^8, 2^9, …), CSV + plot
+- [ ] **Wait on: P1** · inversion benchmark (sizes, repeats, brute-force cutoff, `time_median`), plot, and crossover point
+- [ ] README: Python version, machine, and exact commands to reproduce results
+- [ ] Report 3.1 and 3.2 (bottom-up), 2.5: runtime, and 3.6: Exp 2
+- [ ] Reflection Q2
+
+## P4: Coin Checker + Integrator · Name: _________
+
+Write the answer checker and the shared coin test cases. Then cross-check all the exact solvers
+and search for cases where greedy fails. Finally, merge the report.
+
+**Owns:** `validate.py`, `coin_cases.py`, `test_validate.py`, `counterexamples.py`, `REPORT.md` (final merge), `AI_USE.md` (final merge)
+**Waits on:** P2 and P3 solvers for the cross-check and counterexamples; everyone for the merge
+
+- [ ] `is_valid` (coins sum to A, the count matches, every coin is in D)
+- [ ] 10+ hand cases in `coin_cases.py` (target 0, impossible, multiple optimal answers)
+- [ ] **Wait on: P2 + P3** · 100+ random cross-checks pass (`naive`, `memo`, `bottom_up` agree)
+- [ ] **Wait on: P2 + P3** · counterexample search (`greedy` vs `bottom_up`) finds `D={1,3,4}, A=6`, plus 3+ shown, with one explained
+- [ ] Report 1: Introduction, 3.3: validation (Table 3), and 3.4: counterexamples (Table 4)
+- [ ] Reflection Q5
+- [ ] **Wait on: everyone** · merge Q6
+- [ ] **Wait on: everyone** · final `REPORT.md` merged (8 pages max, no `TODO(` left) and `AI_USE.md` merged
+
+## Shared
+
+`helpers.py` is finished and shared (seed, random inputs, `time_median`, `save_csv`,
+`IMPOSSIBLE`, `new_stats`), so ask the team before changing it. P2 and P3 tests read
+P4's `coin_cases.py`, but never edit it.
+
+**Everyone:**
+- [ ] Your report sections, each within its word target
+- [ ] A 1–2 sentence draft for Q6, sent to P4
+- [ ] Your line in the Contribution Statement (end of `REPORT.md`)
+- [ ] Your rows in `AI_USE.md` (tools used, what they produced, how you checked it)
+
+## Function Signatures
 
 ```python
 # inversions.py (P1)
@@ -51,58 +94,3 @@ bottom_up(D, A, stats=None) -> (count, coins) | IMPOSSIBLE
 is_valid(D, A, result)      -> True / False
 # stats = new_stats() from helpers.py: calls, distinct_states, cache_hits, states_processed
 ```
-
-## Part III Reflection Split
-
-| Question | Owner |
-|---|---|
-| Q1: What work does D&C avoid? | P1 |
-| Q2: Why are inversion subproblems independent but coin subproblems overlap? | P3 |
-| Q3: What role does sorting play? | P1 |
-| Q4: Same recurrence, why such different runtimes? | P2 |
-| Q5: How did baselines help validate? | P4 |
-| Q6: When to try D&C vs. DP? | Everyone drafts a few sentences, P4 merges |
-
-## Progress Tracker
-
-**P1: Inversions**
-- [ ] Brute-force counter
-- [ ] Mergesort counter (returns the sorted array and the count)
-- [ ] 10+ hand-checked arrays
-- [ ] 200+ random cross-checks pass
-- [ ] Correctness explanation
-- [ ] Complexity analysis
-- [ ] Part III Q1 and Q3
-
-**P2: Recursive Coin Solvers**
-- [ ] Greedy
-- [ ] Naive recursion
-- [ ] Memoized DP with reconstruction
-- [ ] Counters (calls, distinct states, cache hits)
-- [ ] Exp 1 run, with the safety cutoff documented
-- [ ] Complexity analysis (greedy, naive, memo)
-- [ ] Part III Q4
-
-**P3: Bottom-Up DP + Timing**
-- [ ] Bottom-up DP with reconstruction and a states counter
-- [ ] Fair timing setup (sizes, repeats, brute-force cutoff), using `time_median` from `helpers.py`
-- [ ] Inversion benchmark, plot, and crossover point
-- [ ] Exp 2 run (A = 2^8, 2^9, ...)
-- [ ] Complexity analysis (bottom-up)
-- [ ] README (Python version, setup, exact commands to reproduce results)
-- [ ] Part III Q2
-
-**P4: Coin Checker + Integrator**
-- [ ] Solution validator (coins sum to A and the count matches)
-- [ ] 10+ hand cases (target 0, impossible, multiple optimal answers)
-- [ ] 100+ random cross-checks pass
-- [ ] Greedy counterexample search finds `D={1,3,4}, A=6`
-- [ ] 3+ counterexamples, with one explained
-- [ ] Part III Q5, then merge Q6
-- [ ] Introduction, then final `REPORT.md` merged (8 pages max) and all TODO blocks removed
-- [ ] `docs/ai_use.md` merged
-
-**Everyone**
-- [ ] Your sections of `REPORT.md` written, within their word targets
-- [ ] Your line in the Contribution Statement (end of `REPORT.md`)
-- [ ] Your rows in `docs/ai_use.md` (tools used, what they produced, how you checked it)
