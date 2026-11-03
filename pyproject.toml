@@ -1,0 +1,19 @@
+# Packaging metadata only. Install with: pip install -r requirements.txt
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gea2"
+version = "0.1.0"
+description = "CMP_SC 4050 GEA2: inversion counting and coin change"
+requires-python = ">=3.10"
+
+# Every .py file in src/ is a top-level module (setuptools finds them automatically).
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
+addopts = "-ra"
