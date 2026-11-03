@@ -99,9 +99,10 @@ is_valid(D, A, result)      -> True / False
 - [ ] Greedy counterexample search finds `D={1,3,4}, A=6`
 - [ ] 3+ counterexamples, with one explained
 - [ ] Part III Q5, then merge Q6
-- [ ] Final report merged (6–8 pages)
+- [ ] Introduction, then final `REPORT.md` merged (8 pages max) and all TODO blocks removed
+- [ ] `docs/ai_use.md` merged
 
 **Everyone**
-- [ ] Your line in the Contribution Statement
-- [ ] Your notes for the AI Use Statement (tools used and how you checked the output)
-- [ ] Your report section handed to P4
+- [ ] Your sections of `REPORT.md` written, within their word targets
+- [ ] Your line in the Contribution Statement (end of `REPORT.md`)
+- [ ] Your rows in `docs/ai_use.md` (tools used, what they produced, how you checked it)

@@ -4,6 +4,8 @@ CMP_SC 4050, Group Algorithm Engineering Assignment 2. Part I counts inversions 
 vs. mergesort). Part II solves coin change (greedy, naive recursion, memoized DP, bottom-up DP).
 See `docs/overview.md` for the assignment and `docs/plan.md` for who owns what.
 
+**Report:** [`REPORT.md`](REPORT.md) · **AI Use Statement:** [`docs/ai_use.md`](docs/ai_use.md)
+
 Language: **Python 3.10+**. Libraries: matplotlib, pytest.
 TODO(P3): note the exact Python version and machine used for the final results.
 
@@ -29,7 +31,7 @@ All code lives in `src/`.
 | `test_validate.py` | validator, exact-solver cross-check, counterexample search tests | P4 |
 | `counterexamples.py` | Part 2B: automated greedy counterexample search | P4 |
 
-Outputs (CSV + PNG) go to `results/`. The report goes in `report/`.
+Outputs (CSV + PNG) go to `results/`. `REPORT.md` embeds the PNGs straight from there.
 
 ## Setup
 
