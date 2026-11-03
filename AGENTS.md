@@ -40,6 +40,7 @@ Unfinished stubs raise `NotImplementedError("P#: name")` and their tests fail. T
 
 ## Rules
 
+- Never add yourself (the agent) as an author of any commit. Only credit the logged in git user (standard git procedure).
 - **Find out which role (P1-P4) you're working for, and edit only that role's files** (see the table in
   `docs/plan.md`). `helpers.py` is finished and shared, so don't change it without asking. `coin_cases.py` belongs to P4.
 - Keep it simple: small functions, short `#` comments, Python 3.10+, standard library plus matplotlib and pytest.
