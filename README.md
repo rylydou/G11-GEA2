@@ -1,67 +1,54 @@
-# CMP_SC 4050: Group Algorithm Engineering Assignment 2
+# GEA2: Divide and Conquer + Dynamic Programming
 
-Divide and conquer (inversion counting) and dynamic programming (coin change).
+CMP_SC 4050, Group Algorithm Engineering Assignment 2. Part I counts inversions (brute force
+vs. mergesort). Part II solves coin change (greedy, naive recursion, memoized DP, bottom-up DP).
 See `docs/overview.md` for the assignment and `docs/plan.md` for who owns what.
 
-## Setup
+Language: **Python 3.10+**. Libraries: matplotlib, pytest.
+TODO(P3): note the exact Python version and machine used for the final results.
 
-Requires **Python 3.10+**. Final results were produced with Python `_____` on `_____` (TODO(P4): fill in).
+## Files
+
+All code lives in `src/`.
+
+| File | What | Owner |
+|---|---|---|
+| `helpers.py` | coin result format, `IMPOSSIBLE`, `new_stats`, seeded inputs, `time_median`, `save_csv` | shared |
+| `inversions.py` | brute force + divide-and-conquer inversion counters | P1 |
+| `test_inversions.py` | Part I hand cases + 200 random cross-checks | P1 |
+| `greedy.py` | greedy, largest coin first | P2 |
+| `recursive.py` | naive recursion + top-down memoized DP | P2 |
+| `test_greedy.py`, `test_recursive.py` | tests for the three solvers above | P2 |
+| `exp1_repeated_subproblems.py` | Part 2C Exp 1: naive vs memo call counts | P2 |
+| `bottom_up.py` | bottom-up DP | P3 |
+| `test_bottom_up.py` | bottom-up tests | P3 |
+| `benchmark_inversions.py` | Part 1B: runtime scaling + crossover | P3 |
+| `exp2_pseudo_polynomial.py` | Part 2C Exp 2: bottom-up runtime as A doubles | P3 |
+| `validate.py` | `is_valid`: independent check of a coin answer | P4 |
+| `coin_cases.py` | coin hand cases + test-only answer key, used by every coin test | P4 |
+| `test_validate.py` | validator, exact-solver cross-check, counterexample search tests | P4 |
+| `counterexamples.py` | Part 2B: automated greedy counterexample search | P4 |
+
+Outputs (CSV + PNG) go to `results/`. The report goes in `report/`.
+
+## Setup
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt    # pytest, matplotlib, and src/ (editable, so imports work anywhere)
+pip install -r requirements.txt
 ```
 
-## Run the tests
+## Run
 
 ```bash
-pytest                                   # everything
-pytest tests/test_inversions.py          # one file
+pytest                                   # all tests
+pytest src/test_recursive.py -k memo     # one file, one solver
+python src/benchmark_inversions.py       # Part 1B
+python src/counterexamples.py            # Part 2B
+python src/exp1_repeated_subproblems.py  # Part 2C Exp 1
+python src/exp2_pseudo_polynomial.py     # Part 2C Exp 2
 ```
 
-Tests for unfinished stubs show as **SKIPPED** with the owner and function
-(e.g. `not implemented yet: P2: memo`). A **FAILED** test means real code gave a wrong answer.
-
-## Reproduce the experiments
-
-Each script writes `results/<name>.csv` plus `results/<name>.meta.json` (seed, parameters, machine info).
-
-```bash
-python experiments/inversion_benchmark.py
-python experiments/exp1_repeated_subproblems.py
-python experiments/exp2_pseudo_polynomial.py
-python experiments/greedy_counterexamples.py
-```
-
-Make plots from the CSVs (saved to `results/plots/`):
-
-```bash
-python experiments/plot_results.py results/inversion_benchmark.csv --x n --y median_seconds --group-by algorithm --logx --logy
-python experiments/plot_results.py results/exp1_repeated_subproblems.csv --x A --y calls --group-by solver --logy
-python experiments/plot_results.py results/exp2_pseudo_polynomial.csv --x bit_length --y median_seconds --logy
-```
-
-## Layout
-
-```
-src/                         flat: every file is a top-level module (e.g. `from coins import memo`)
-  inversions.py          P1  brute force + sort-and-count
-  coins.py               --  one import point for all coin code (re-exports the files below)
-  coin_common.py         --  shared contract: IMPOSSIBLE, stats keys, input checks
-  greedy.py              P2
-  naive.py               P2
-  memo.py                P2
-  bottom_up.py           P3
-  timing.py              P3  timing harness
-  validate.py            P4  independent solution validator
-  counterexamples.py     P4  greedy counterexample search
-  generators.py          --  seeded random inputs
-  results.py             --  CSV/JSON + run metadata
-  plotting.py            --  plots from CSVs
-tests/                       one test file per role + shared hand cases (cases.py)
-experiments/                 one script per experiment + plot_results.py
-results/                     CSV/JSON outputs (committed; required deliverable)
-report/                      engineering report
-docs/                        assignment, overview, team plan
-```
+Until a function is written, its tests fail with `NotImplementedError: P#: name`.
+All randomness uses `SEED = 4050` from `helpers.py`, so every run gives the same output.

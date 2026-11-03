@@ -1,28 +1,14 @@
-"""Greedy largest-denomination-first heuristic (Part 2A-A).  Owner: P2
+# Part 2A-A: greedy, largest coin first.  Owner: P2
+#
+# A heuristic only, not a correct solver for every coin system.
+# Result format: see the top of helpers.py.
 
-This is a comparison heuristic, NOT a correct solver for arbitrary coin systems.
-"""
-
-from __future__ import annotations
-
-from collections.abc import Iterable
-
-from coin_common import IMPOSSIBLE, CoinResult, check_target, normalize_denominations
+from helpers import IMPOSSIBLE
 
 
-def greedy(D: Iterable[int], A: int) -> CoinResult:
-    """Repeatedly take the largest denomination that does not exceed the remaining amount.
-
-    Returns:
-        (coin_count, chosen_coins), or IMPOSSIBLE if the rule gets stuck
-        (amount left over but no coin fits). Greedy can get stuck even when a
-        solution exists, e.g. D = {3, 5}, A = 9: greedy takes 5, then 3, and has 1 left.
-
-    Example:
-        >>> greedy([1, 3, 4], 6)   # not optimal; 3 + 3 uses 2 coins
-        (3, [4, 1, 1])
-    """
-    denoms = normalize_denominations(D)
-    check_target(A)
-    # TODO(P2): walk denominations from largest to smallest.
+def greedy(D, A):
+    # Repeatedly take the largest coin that fits in what's left.
+    # Return IMPOSSIBLE if it gets stuck (D=[3,5], A=9: takes 5, then 3, and 1 is left).
+    # Example of a bad answer: greedy([1,3,4], 6) gives 4+1+1, but 3+3 is better.
+    # TODO(P2)
     raise NotImplementedError("P2: greedy")

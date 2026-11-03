@@ -1,37 +1,12 @@
-"""Independent solution validator (Part 2B).  Owner: P4
+# Part 2B: independent check of a coin solver's answer.  Owner: P4
+#
+# Result format: see the top of helpers.py.
 
-Checks a solver's answer without trusting the solver.
-"""
-
-from __future__ import annotations
-
-from collections.abc import Iterable
-from typing import Any
-
-from coin_common import IMPOSSIBLE, CoinResult
-
-NOT_GIVEN: Any = object()  # default for expected_count: "don't check the count"
+from helpers import IMPOSSIBLE
 
 
-def validate_solution(
-    D: Iterable[int],
-    A: int,
-    result: CoinResult,
-    expected_count: int | None = NOT_GIVEN,
-) -> None:
-    """Raise ValueError (with a clear message) if `result` is not a valid answer.
-
-    Always check:
-        - result is IMPOSSIBLE or a (coin_count, chosen_coins) pair
-        - coin_count == len(chosen_coins)
-        - sum(chosen_coins) == A
-        - every coin is one of the denominations in D
-
-    If expected_count is given:
-        - expected_count=IMPOSSIBLE -> result must be IMPOSSIBLE
-        - expected_count=<int>      -> result must exist and use exactly that many coins
-
-    Returns None when the result is valid.
-    """
+def is_valid(D, A, result):
+    # True if result is IMPOSSIBLE, or if count == len(coins), sum(coins) == A,
+    # and every coin is in D. This does NOT check optimality (compare counts for that).
     # TODO(P4)
-    raise NotImplementedError("P4: validate_solution")
+    raise NotImplementedError("P4: is_valid")

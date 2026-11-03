@@ -1,4 +1,2 @@
-pytest>=8.0
 matplotlib>=3.8
-# Installs src/ in editable mode so `import coins`, `import inversions`, etc. work from tests and experiments.
--e .
+pytest>=7.0

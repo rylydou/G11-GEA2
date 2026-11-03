@@ -1,31 +1,13 @@
-"""Bottom-up DP (Part 2A-D).  Owner: P3
+# Part 2A-D: bottom-up DP.  Owner: P3
+#
+# Also the "exact DP" that P4's counterexample search compares greedy against.
+# Result format and stats counters: see the top of helpers.py.
 
-Also serves as the "exact DP" ground truth for P4's greedy counterexample search
-and is the solver measured in Exp 2 (pseudo-polynomial scaling).
-"""
-
-from __future__ import annotations
-
-from collections.abc import Iterable
-
-from coin_common import IMPOSSIBLE, CoinResult, bump, check_target, normalize_denominations
+from helpers import IMPOSSIBLE
 
 
-def bottom_up(D: Iterable[int], A: int, stats: dict[str, int] | None = None) -> CoinResult:
-    """Exact minimum-coin solution by filling a table for amounts 0, 1, ..., A in order.
-
-    Suggested approach:
-        - best[a]   = fewest coins to make amount a (or "infinity" if impossible)
-        - choice[a] = a coin used in one optimal solution for a
-        - rebuild the coin list by following choice[] from A down to 0
-
-    Instrumentation (when stats is not None), see `coin_common.py`:
-        states_processed += 1 per table entry computed (A + 1 total, amounts 0..A)
-
-    Returns:
-        (coin_count, chosen_coins) or IMPOSSIBLE.
-    """
-    denoms = normalize_denominations(D)
-    check_target(A)
+def bottom_up(D, A, stats=None):
+    # Fill best[0..A] in increasing order, plus choice[a] = a coin used for amount a.
+    # Rebuild the coin list by following choice[] back from A to 0.
     # TODO(P3)
     raise NotImplementedError("P3: bottom_up")
