@@ -20,7 +20,7 @@ is correct and how fast each one is.
 - [ ] Report 2.1–2.4: algorithms, correctness, complexity, validation (Table 1)
 - [ ] Reflection Q1 and Q3
 
-## P2: Recursive Coin Solvers · Name: _________
+## P2: Recursive Coin Solvers · Name: Ryly Dou
 
 Write the greedy, naive recursive, and memoized coin solvers, including call counters. Then run
 Experiment 1 to show how much repeated work memoization saves.
@@ -28,11 +28,11 @@ Experiment 1 to show how much repeated work memoization saves.
 **Owns:** `greedy.py`, `recursive.py`, `test_greedy.py`, `test_recursive.py`, `exp1_repeated_subproblems.py`
 **Waits on:** nobody
 
-- [ ] `greedy`, `naive`, and `memo` (with reconstruction of the coin list)
-- [ ] Counters: calls, distinct states, cache hits
-- [ ] Exp 1 run (CSV + plot), with the safety cutoff documented
-- [ ] Report 3.1 and 3.2 (greedy, naive, memo), and 3.5: Exp 1
-- [ ] Reflection Q4
+- [x] `greedy`, `naive`, and `memo` (with reconstruction of the coin list)
+- [x] Counters: calls, distinct states, cache hits
+- [x] Exp 1 run (CSV + plot), with the safety cutoff documented
+- [x] Report 3.1 and 3.2 (greedy, naive, memo), and 3.5: Exp 1
+- [x] Reflection Q4
 
 ## P3: Bottom-Up DP + Timing · Name: _________
 
