@@ -15,10 +15,10 @@ is correct and how fast each one is.
 **Owns:** `inversions.py`, `test_inversions.py`
 **Waits on:** nobody
 
-- [ ] `brute_force` and `sort_and_count` (returns the sorted array and the count)
-- [ ] 10+ hand-checked arrays, and 200+ random cross-checks pass
-- [ ] Report 2.1–2.4: algorithms, correctness, complexity, validation (Table 1)
-- [ ] Reflection Q1 and Q3
+- [x] `brute_force` and `sort_and_count` (returns the sorted array and the count)
+- [x] 10+ hand-checked arrays, and 200+ random cross-checks pass
+- [x] Report 2.1–2.4: algorithms, correctness, complexity, validation (Table 1)
+- [x] Reflection Q1 and Q3
 
 ## P2: Recursive Coin Solvers · Name: Ryly Dou
 

@@ -9,15 +9,21 @@ import pytest
 from helpers import SEED, random_array
 from inversions import brute_force, merge_and_count, sort_and_count
 
-# (array, expected inversions). TODO(P1): add more to reach 10+ hand-checked cases.
+# (array, expected inversions). 12 hand-checked cases covering base cases,
+# sorted, reverse, nearly sorted, cross-only, and negative numbers.
 HAND_CASES = [
     ([], 0),
     ([42], 0),
-    ([1, 2, 3, 4, 5], 0),     # sorted
-    ([5, 4, 3, 2, 1], 10),    # reverse sorted: n(n-1)/2
-    ([1, 2, 4, 3, 5], 1),     # nearly sorted: (4,3)
-    ([2, 4, 1, 3, 5], 3),     # random: (2,1) (4,1) (4,3)
-    ([3, 1, 4, 5, 2], 4),     # random: (3,1) (3,2) (4,2) (5,2)
+    ([1, 2], 0),
+    ([2, 1], 1),
+    ([1, 2, 3, 4, 5], 0),
+    ([5, 4, 3, 2, 1], 10),
+    ([1, 2, 4, 3, 5], 1),
+    ([2, 4, 1, 3, 5], 3),
+    ([3, 1, 4, 5, 2], 4),
+    ([6, 5, 4, 3, 2, 1], 15),
+    ([1, 3, 5, 2, 4, 6], 3),
+    ([10, -5, 0, 7, 3], 5),
 ]
 
 

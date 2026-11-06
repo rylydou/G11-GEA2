@@ -21,7 +21,7 @@ Delete this comment and the TODO lines before submitting.
 |---|---|---|
 | Claude Code (Claude Opus 5.5) | _________ | Project setup: see the first row below |
 | Claude Code (Claude Opus 5.5) | Ryly Dou | P2: coin solvers (greedy, naive, memo), Experiment 1, report sections 3.1, 3.2, 3.5, Q4, and the Q6 draft |
-| _ | _ | _ |
+| Antigravity (Gemini 3.8 Flash) | Solomon Canoy | P1: inversions implementation, test case expansion, report sections 2.1–2.4, Q1, Q3, and Q6 draft |
 
 ## Contributions and Verification
 
@@ -34,7 +34,7 @@ One row per meaningful use. Say what the AI produced, what a human changed, and 
 | Ryly Dou | P2: `greedy.py`, `recursive.py` | All of `greedy`, `naive`, and `memo`, including the stats counters, coin-list rebuild, and recursion-limit raise | Nothing so far | `pytest src/test_greedy.py src/test_recursive.py`: 22 passed. Extra check: on 500 seeded random cases, naive and memo matched the BFS answer key in `coin_cases.py`, and memo's `calls == distinct_states + cache_hits` held every time. Memo ran on A = 100,000 and its coins summed to A. TODO(P2): hand-trace D = {1, 3, 4}, A = 6 through both solvers |
 | Ryly Dou | P2: `exp1_repeated_subproblems.py`, `results/exp1_repeated_subproblems.*` | Experiment script (D = {1, 3, 4}, A = 0..60 step 2, 10^7-call cutoff), CSV, and plot | Nothing so far | Ran it, then checked the CSV with a script: memo calls = 3A − 4 for every A ≥ 4, and naive and memo reached the same number of distinct amounts at every A. TODO(P2): look over the plot and spot-check a few CSV rows |
 | Ryly Dou | P2: `REPORT.md` 3.1, 3.2 (greedy, naive, memo rows), 3.5, Table 5, Q4; Q6 draft | Section text, complexity rows, figure caption | Nothing so far | Every number in the text and in Table 5 was compared with `results/exp1_repeated_subproblems.csv`. TODO(P2): re-derive the Table 2 bounds by hand (naive O(k^(A/d_min)) calls and O(A²) space; memo O(kA)) |
-| _________ | _ | _ | _ | _ |
+| Solomon Canoy | P1: `src/inversions.py`, `src/test_inversions.py`, `REPORT.md` | Initial code for `brute_force`, `merge_and_count`, and `sort_and_count`; additional test cases; report sections 2.1–2.4, Q1, and Q3 drafts | Reviewed and verified algorithm logic, adjusted inductive proof, formatted Table 1, and ensured word targets | Ran pytest suite (27 passed: 12 hand-checked arrays and 200 random arrays); verified against assignment rubric |
 
 ## Members Who Used No Generative AI
 

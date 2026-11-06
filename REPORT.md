@@ -32,42 +32,64 @@ HOW TO USE THIS SKELETON
 
 ### 2.1 Algorithms
 
-> **TODO(P1) · ~150 words.** Define an inversion. Describe the brute-force pair check and the
-> sort-and-count mergesort in a few sentences each. Explain the key merge step: when the next
-> right-half element is smaller, it forms an inversion with every remaining left-half element.
-> A short pseudocode block for `merge_and_count` is fine if it fits.
+An inversion in an array $A$ is a pair of indices $(i, j)$ such that $i < j$ and $A[i] > A[j]$, representing two elements that appear out of sorted order.
+
+The brute-force algorithm (`brute_force`) checks every pair $(i, j)$ with $0 \le i < j < n$ using nested loops. For each pair, it increments a counter whenever $A[i] > A[j]$. It is simple and serves as an oracle for verification.
+
+The divide-and-conquer algorithm (`sort_and_count`) modifies mergesort. It recursively splits the array into two halves, recursively counts inversions within each half, and merges the two sorted halves while counting cross-inversions (`merge_and_count`).
+
+The key step occurs during the merge. Because both left and right subarrays are already sorted, when the current right element $R[j]$ is strictly smaller than the current left element $L[i]$, $R[j]$ is also smaller than every remaining element in $L$. We therefore add $|L| - i$ to the inversion count in $O(1)$ time and advance $j$.
 
 ### 2.2 Correctness
 
-> **TODO(P1) · ~200 words.** Every inversion (i, j) is one of three kinds: both indices in the left
-> half, both in the right half, or split across the halves. Explain why the recursion counts the
-> first two kinds, and why the merge counts each cross inversion exactly once. Say why sorting the
-> halves doesn't change the cross count. Use induction on n.
+Every inversion $(i, j)$ in an array split into left half $L = A[:mid]$ and right half $R = A[mid:]$ falls into exactly one of three disjoint cases: both indices in $L$, both in $R$, or split across halves ($i < mid \le j$, a cross inversion).
+
+We prove correctness by induction on length $n$.
+
+**Base Case:** If $n \le 1$, no pairs exist. The algorithm returns $0$ and the array, which is correctly sorted.
+
+**Inductive Step:** Assume `sort_and_count` correctly sorts and counts inversions for arrays of length $< n$. By hypothesis, recursive calls on $L$ and $R$ return sorted subarrays and correct counts for left and right inversions.
+
+Sorting $L$ and $R$ permutes elements only within each half; every element of $L$ still precedes every element of $R$. Therefore, sorting preserves the exact set of cross inversions. During `merge_and_count`, elements are processed in sorted order using two pointers. When $R[j] < L[i]$, sorted order guarantees $R[j] < L[k]$ for all remaining $k \in [i, |L|-1]$. Adding $|L| - i$ accounts for all cross inversions involving $R[j]$. Because every element in $R$ is advanced exactly once, each cross inversion is counted exactly once. Combining left, right, and cross counts yields the exact total.
 
 ### 2.3 Complexity
 
-> **TODO(P1) · ~150 words.** Brute force: count the comparisons and conclude Θ(n²).
-> Divide and conquer: write the recurrence T(n), solve it (recursion tree or Master Theorem),
-> and state the result. Mention the extra space used by merging.
+For `brute_force`, the outer loop runs $n$ times and the inner loop runs $n - 1 - i$ times. The total number of comparisons is:
+$$\sum_{i=0}^{n-1} (n - 1 - i) = \frac{n(n - 1)}{2} = \Theta(n^2)$$
+Each comparison takes $O(1)$ time and requires $O(1)$ auxiliary space.
+
+For `sort_and_count`, splitting takes $O(1)$ time, two recursive calls operate on subarrays of size $n/2$, and `merge_and_count` scans each element of $L$ and $R$ once, taking $\Theta(n)$ time. The recurrence is:
+$$T(n) = 2T(n/2) + \Theta(n)$$
+By Case 2 of the Master Theorem ($a = 2, b = 2, f(n) = \Theta(n)$, where $\log_b a = 1$), the recurrence solves to $\Theta(n \log n)$. A recursion tree yields the same result: $\log_2 n$ levels, each performing $\Theta(n)$ total merge work.
+
+Merging constructs a new combined list, using $\Theta(n)$ auxiliary space at each level, alongside $O(\log n)$ call stack frames.
 
 ### 2.4 Validation
 
-> **TODO(P1) · ~120 words + Table 1.** Brute force is the oracle. Describe the 10+ hand-checked
-> arrays (Table 1) and the 200+ seeded random arrays, including the sizes and the seed.
-> State the outcome: the methods agreed on every tested array. Don't claim this proves correctness.
+We validated `sort_and_count` against `brute_force`, treating the brute-force implementation as our oracle.
+
+First, we tested 12 hand-checked arrays in `test_inversions.py` (Table 1), covering edge cases (empty and single-element lists), sorted arrays, reverse-sorted arrays, nearly-sorted arrays, cross-only inversions, and lists with negative numbers. Both algorithms produced matching inversion counts on every case.
+
+Second, we performed an automated cross-check on 200 pseudo-random arrays of varying lengths ($n \in [0, 60]$) using `random.Random(4050)` (seed `SEED = 4050`). In every trial, `sort_and_count` matched the brute-force count exactly and returned an accurately sorted list.
+
+While these 212 passing tests confirm implementation agreement across varied inputs, empirical testing does not replace mathematical proof; correctness is guaranteed by the inductive argument in Section 2.2.
 
 **Table 1.** Hand-checked arrays (from `src/test_inversions.py`).
 
 | Array | Type | Expected inversions | Brute force | Divide and conquer |
 |---|---|---|---|---|
-| `[]` | empty | 0 | _ | _ |
-| `[42]` | single | 0 | _ | _ |
-| `[1, 2, 3, 4, 5]` | sorted | 0 | _ | _ |
-| `[5, 4, 3, 2, 1]` | reverse sorted | 10 | _ | _ |
-| `[1, 2, 4, 3, 5]` | nearly sorted | 1 | _ | _ |
-| `[2, 4, 1, 3, 5]` | random | 3 | _ | _ |
-| `[3, 1, 4, 5, 2]` | random | 4 | _ | _ |
-| _add 3+ more_ | | | | |
+| `[]` | empty | 0 | 0 | 0 |
+| `[42]` | single | 0 | 0 | 0 |
+| `[1, 2]` | two sorted | 0 | 0 | 0 |
+| `[2, 1]` | two reversed | 1 | 1 | 1 |
+| `[1, 2, 3, 4, 5]` | sorted | 0 | 0 | 0 |
+| `[5, 4, 3, 2, 1]` | reverse sorted | 10 | 10 | 10 |
+| `[1, 2, 4, 3, 5]` | nearly sorted | 1 | 1 | 1 |
+| `[2, 4, 1, 3, 5]` | random | 3 | 3 | 3 |
+| `[3, 1, 4, 5, 2]` | random | 4 | 4 | 4 |
+| `[6, 5, 4, 3, 2, 1]` | reverse sorted (n=6) | 15 | 15 | 15 |
+| `[1, 3, 5, 2, 4, 6]` | cross-only | 3 | 3 | 3 |
+| `[10, -5, 0, 7, 3]` | negative / mixed | 5 | 5 | 5 |
 
 ### 2.5 Runtime Scaling
 
@@ -219,13 +241,13 @@ stopped after it passed the 10^7-call cutoff at A = 34. Data: `results/exp1_repe
 > refer back to them instead of repeating it.
 
 **Q1. What work does divide and conquer avoid compared with checking every pair?**
-> TODO(P1) · ~80 words.
+Brute force redundantly checks all $\binom{n}{2} = \Theta(n^2)$ pairs one by one. Divide and conquer avoids this pairwise search during the merge step by exploiting the sorted order of each half. When a right-half element $R[j]$ is smaller than a left-half element $L[i]$, it is guaranteed to be smaller than all remaining elements $L[i \dots |L|-1]$. Instead of doing $|L| - i$ separate comparisons, the algorithm counts all $|L| - i$ inversions in a single $O(1)$ arithmetic addition.
 
 **Q2. Why are inversion subproblems independent before the merge, while coin-change subproblems overlap heavily?**
 > TODO(P3) · ~80 words.
 
 **Q3. What role does sorting play in the divide-and-conquer improvement?**
-> TODO(P1) · ~80 words.
+Sorting is the mechanism that enables batch counting of cross inversions. By maintaining the invariant that recursive calls return sorted subarrays, the merge step can infer relative order across multiple pairs by transitivity. If the halves were unsorted, seeing $L[i] > R[j]$ would tell us nothing about whether subsequent left elements exceed $R[j]$, forcing an exhaustive pairwise check of $\Theta(n^2)$. Sorting costs only $\Theta(n \log n)$ overall while reducing merge comparisons from quadratic to linear $\Theta(n)$.
 
 **Q4. Naive and memoized coin change use essentially the same recurrence. Why can their runtimes be so different?**
 Memo doesn't change the recurrence. It only skips repeated work. At A = 34, both solvers reached the
@@ -241,6 +263,8 @@ took 1.70 s and memo took 9.7 µs (Section 3.5).
 > TODO(everyone drafts 1–2 sentences; P4 merges) · ~100 words. Contrast independent subproblems
 > with overlapping ones.
 >
+> **P1 draft:** Choose divide and conquer when the problem decomposes into disjoint, independent subproblems whose results can be combined efficiently without sharing state. Choose dynamic programming when subproblems overlap heavily and evaluate identical state transitions repeatedly.
+>
 > **P2 draft:** Try divide and conquer first when the problem splits into parts that can be solved
 > on their own and combined cheaply, like the two halves in inversion counting, which share nothing
 > until the merge. Try dynamic programming when a natural recursion keeps reaching the same
@@ -255,7 +279,7 @@ _Separate deliverable; doesn't count toward the page limit._
 
 | Member | Role | Primary contributions |
 |---|---|---|
-| _________ | P1: Inversions | _ |
+| Solomon Canoy | P1: Inversions | Implemented `brute_force`, `merge_and_count`, and `sort_and_count` in `inversions.py`; expanded `test_inversions.py` with 12 hand-checked cases and verified 200 random trials; authored Report Sections 2.1–2.4 (Table 1), Reflection Q1, Q3, and Q6 draft. |
 | Ryly Dou | P2: Recursive coin solvers | `greedy`, `naive`, and `memo` solvers with call counters; Experiment 1 (script, CSV, Figure 2); Report 3.1, 3.2 (greedy, naive, memo), 3.5, and Q4 |
 | _________ | P3: Bottom-up DP + timing | _ |
 | _________ | P4: Coin checker + integrator | _ |
