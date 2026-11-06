@@ -7,7 +7,7 @@ when something another person is waiting on is ready.
 **Only edit files you own** (all in `src/`). If you need a change in someone else's file, ask them.
 Fill in the `TODO(P#)` stubs, then make your tests pass. Tasks starting with **Wait on:** need someone else's work first.
 
-## P1: Inversions · Name: _________
+## P1: Inversions · Name: Solomon Canoy
 
 Write both inversion counters and check them against each other. Then explain why the fast one
 is correct and how fast each one is.
