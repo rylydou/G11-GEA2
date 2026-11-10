@@ -22,7 +22,7 @@ Delete this comment and the TODO lines before submitting.
 | Claude Code (Claude Opus 5.5) | _________ | Project setup: see the first row below |
 | Claude Code (Claude Opus 5.5) | Ryly Dou | P2: coin solvers (greedy, naive, memo), Experiment 1, report sections 3.1, 3.2, 3.5, Q4, and the Q6 draft |
 | Antigravity (Gemini 3.8 Flash) | Solomon Canoy | P1: inversions implementation, test case expansion, report sections 2.1–2.4, Q1, Q3, and Q6 draft |
-| Claude Code (TODO(P3): model name) | Prajit | P3: bottom-up solver and tests, inversion benchmark, Experiment 2, README, report sections 2.5, 3.1–3.2 (bottom-up), 3.6, Q2, and the Q6 draft |
+| Claude Code (Claude Opus 5.5 | Prajit | P3: bottom-up solver and tests, inversion benchmark, Experiment 2, README, report sections 2.5, 3.1–3.2 (bottom-up), 3.6, Q2, and the Q6 draft |
 
 ## Contributions and Verification
 
