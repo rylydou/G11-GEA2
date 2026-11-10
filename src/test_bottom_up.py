@@ -33,3 +33,16 @@ def test_stats():
         stats = new_stats()
         bottom_up([1, 3, 4], A, stats)
         assert stats["states_processed"] == A + 1
+
+
+def test_no_one_coin_with_gaps():
+    # D = {4, 7} with no 1-coin: many amounts in the table are unreachable,
+    # and the rebuild must only step through reachable ones.
+    for A in range(0, 60):
+        check([4, 7], A, bottom_up([4, 7], A), reference_count([4, 7], A))
+
+
+def test_large_A():
+    # No recursion, so a large A works without touching Python's recursion limit.
+    A = 2**16
+    check([1, 5, 12, 19], A, bottom_up([1, 5, 12, 19], A), reference_count([1, 5, 12, 19], A))

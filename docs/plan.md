@@ -34,7 +34,7 @@ Experiment 1 to show how much repeated work memoization saves.
 - [x] Report 3.1 and 3.2 (greedy, naive, memo), and 3.5: Exp 1
 - [x] Reflection Q4
 
-## P3: Bottom-Up DP + Timing · Name: _________
+## P3: Bottom-Up DP + Timing · Name: Prajit
 
 Write the bottom-up coin solver. Then do all the timing: the inversion benchmark and Experiment 2.
 Also own the README.
@@ -42,12 +42,12 @@ Also own the README.
 **Owns:** `bottom_up.py`, `test_bottom_up.py`, `benchmark_inversions.py`, `exp2_pseudo_polynomial.py`, `README.md`
 **Waits on:** P1 (`brute_force`, `sort_and_count`), but only for the benchmark
 
-- [ ] `bottom_up` (with reconstruction and the `states_processed` counter)
-- [ ] Exp 2 run (A = 2^8, 2^9, …), CSV + plot
-- [ ] **Wait on: P1** · inversion benchmark (sizes, repeats, brute-force cutoff, `time_median`), plot, and crossover point
-- [ ] README: Python version, machine, and exact commands to reproduce results
-- [ ] Report 3.1 and 3.2 (bottom-up), 2.5: runtime, and 3.6: Exp 2
-- [ ] Reflection Q2
+- [x] `bottom_up` (with reconstruction and the `states_processed` counter)
+- [x] Exp 2 run (A = 2^8, 2^9, …), CSV + plot
+- [x] **Wait on: P1** · inversion benchmark (sizes, repeats, brute-force cutoff, `time_median`), plot, and crossover point
+- [x] README: Python version, machine, and exact commands to reproduce results
+- [x] Report 3.1 and 3.2 (bottom-up), 2.5: runtime, and 3.6: Exp 2
+- [x] Reflection Q2
 
 ## P4: Coin Checker + Integrator · Name: _________
 

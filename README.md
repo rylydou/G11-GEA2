@@ -7,7 +7,16 @@ See `docs/overview.md` for the assignment and `docs/plan.md` for who owns what.
 **Report:** [`REPORT.md`](REPORT.md) · **AI Use Statement:** [`AI_USE.md`](AI_USE.md)
 
 Language: **Python 3.10+**. Libraries: matplotlib, pytest.
-TODO(P3): note the exact Python version and machine used for the final results.
+
+## Machine Used for the Results
+
+| Results | Machine | Python |
+|---|---|---|
+| `benchmark_inversions.*`, `exp2_pseudo_polynomial.*` | Linux cloud container (kernel 6.18, x86_64), Intel Xeon Processor @ 2.10 GHz, 4 vCPUs, 15 GB RAM | CPython 3.13.18, matplotlib 3.11.2, pytest 9.2.0 |
+| `exp1_repeated_subproblems.*` | TODO(P2): add the machine Experiment 1 was run on | TODO(P2) |
+
+Timings depend on the machine, so yours will differ. Counts (recursive calls, cache hits, DP
+states) and every coin answer are exact and come out the same on any machine.
 
 ## Files
 
@@ -54,3 +63,24 @@ python src/exp2_pseudo_polynomial.py     # Part 2C Exp 2
 
 Until a function is written, its tests fail with `NotImplementedError: P#: name`.
 All randomness uses `SEED = 4050` from `helpers.py`, so every run gives the same output.
+
+## Reproduce the Report's Results
+
+Run these from the repo root with the virtual environment active. Each script overwrites its
+CSV and PNG in `results/` and prints what it saved.
+
+```bash
+pytest                                   # 1. check every solver first
+python src/benchmark_inversions.py       # 2. Section 2.5, Figure 1 (about 30 s)
+python src/exp1_repeated_subproblems.py  # 3. Section 3.5, Figure 2, Table 5
+python src/exp2_pseudo_polynomial.py     # 4. Section 3.6, Figure 3, Table 6 (about 30 s)
+python src/counterexamples.py            # 5. Section 3.4, Table 4
+```
+
+| Script | Settings (top of the file) | Writes |
+|---|---|---|
+| `benchmark_inversions.py` | n = 2^1..2^17 plus 3·2^i midpoints, median of 7 runs, brute force stops after a run passes 1 s | `benchmark_inversions.csv`, `.png`; also prints the crossover n and log-log slopes |
+| `exp1_repeated_subproblems.py` | D = {1, 3, 4}, A = 0..60 step 2, naive stops after passing 10^7 calls, median of 3 runs | `exp1_repeated_subproblems.csv`, `.png` |
+| `exp2_pseudo_polynomial.py` | D = {1, 5, 12, 19}, A = 2^8..2^22, median of 7 runs | `exp2_pseudo_polynomial.csv`, `.png` |
+
+Close other heavy programs while timing. The medians cut down noise but don't remove it.

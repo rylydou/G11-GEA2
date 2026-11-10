@@ -93,16 +93,30 @@ While these 212 passing tests confirm implementation agreement across varied inp
 
 ### 2.5 Runtime Scaling
 
-> **TODO(P3) · ~250 words + Figure 1.** Methodology: the sizes n, the number of repeats, using the
-> median, how inputs were generated outside the timed region, the brute-force cutoff, and the
-> machine. Results: describe Figure 1. Does the log-log slope look like n² versus n log n?
-> Crossover: give the approximate n where divide and conquer becomes faster on our machine, and
-> explain why that point depends on the implementation and hardware (constant factors, Python
-> overhead, recursion and list copying, cache).
+**Method.** For each size n we built one seeded random array (seed 4050) before timing, then
+timed both counters on it, so only the calls are measured. Sizes were the powers of two from 2 to
+131,072 plus the midpoints 3·2^i (33 sizes) for finer steps near the crossover. Each point is the
+median of 7 calls (`time_median`). Brute force stopped
+after the first size whose median passed 1 s (n = 8,192, at 1.48 s). Divide and conquer continued
+to n = 131,072. Machine: Intel Xeon @ 2.10 GHz cloud container (4 vCPUs, Linux), Python 3.13.18.
+
+**Results.** On log-log axes (Figure 1) both curves become straight lines. A least-squares fit
+over n ≥ 256 gives a slope of 2.04 for brute force, which matches n², and 1.11 for divide and
+conquer, which matches n log n (the log factor makes it a bit more than 1). At n = 8,192, brute
+force took 1.48 s and divide and conquer took 11.3 ms, about 131× faster.
+
+**Crossover.** Brute force wins on small arrays: 0.33 µs vs 0.84 µs at n = 2, and 14.4 µs vs
+19.7 µs at n = 32. The two are tied at n = 48 (34.1 vs 33.2 µs), and divide and conquer is faster
+at every tested size from 48 up. Constant factors set this point, not Big-O. Our mergesort makes
+about 2n recursive Python calls, copies each half with slicing, and builds new merged lists, while
+brute force runs a tight compare-and-add loop. A compiled language, another Python version, or a
+different CPU and cache would change these constants and move the crossover.
 
 ![Figure 1: Median runtime vs n, brute force vs divide and conquer (log-log)](results/benchmark_inversions.png)
 
-**Figure 1.** _caption: sizes, repeats, machine._ Data: `results/benchmark_inversions.csv`.
+**Figure 1.** Median of 7 runs per n, one seeded random array per size, n = 2 to 131,072. Brute
+force stopped after it passed 1 s at n = 8,192. The dashed line marks the crossover (n ≈ 48).
+Intel Xeon @ 2.10 GHz, Python 3.13.18. Data: `results/benchmark_inversions.csv`.
 
 ---
 
@@ -125,8 +139,11 @@ best count and the last coin used in a dictionary. Later calls for that amount r
 value. To rebuild one optimal coin list, it starts at A, takes the stored coin d, moves to A − d,
 and repeats until it reaches 0.
 
-> **TODO(P3) · ~70 words.** Bottom-up DP: the table, the order it's filled, and how one optimal coin
-> list is rebuilt from the stored choices.
+**Bottom-up DP** fills a table best[0..A] with the same recurrence, in increasing order from
+best[0] = 0. Every a − d is smaller than a, so each sub-answer is final before it's needed.
+Unreachable amounts hold ∞, which never wins the min. It also stores choice[a], the coin that gave
+the minimum. To rebuild one optimal coin list, it follows choice[] from A down to 0. No recursion
+is needed.
 
 ### 3.2 Complexity
 
@@ -138,7 +155,8 @@ hold a coin list of up to A coins, so the extra space is O(A²) in the worst cas
 at most A + 1 distinct amounts, and each one loops over k coins once, so it takes O(kA) time. The
 cache and the stack are both O(A). The depth can reach A, so memo raises Python's recursion limit.
 
-> **TODO(P3) · ~30 words.** Explain the bottom-up row.
+**Bottom-up** fills all A + 1 amounts (Section 3.6 counted exactly A + 1) and checks k coins at
+each: Θ(kA) time. The best and choice tables use Θ(A) space.
 
 **Table 2.** Time and auxiliary-space complexity.
 
@@ -147,7 +165,7 @@ cache and the stack are both O(A). The depth can reach A, so memo raises Python'
 | Greedy | O(k log k + A/d_min) | O(k) | Sorted copy of D. Not always optimal |
 | Naive recursion | O(k^(A/d_min)) calls (exponential) | O(A²) worst case | Depth up to A/d_min; each frame holds a coin list |
 | Top-down memo | O(kA) | O(A) | Cache of A + 1 entries; depth up to A/d_min |
-| Bottom-up DP | _ | _ | _ |
+| Bottom-up DP | Θ(kA) | Θ(A) | Two tables of A + 1 entries; fills every amount, even unreachable ones; no recursion |
 
 ### 3.3 Exact-Solver Validation
 
@@ -216,21 +234,37 @@ stopped after it passed the 10^7-call cutoff at A = 34. Data: `results/exp1_repe
 
 ### 3.6 Experiment 2: Pseudo-Polynomial Scaling
 
-> **TODO(P3) · ~200 words + Figure 3 + Table 6.** Setup: the fixed coin system (k), and A = 2^8, 2^9, ….
-> Report A, its bit length, the DP states processed, and the runtime. Interpretation: the work grows
-> linearly in A, but exponentially in the number of bits needed to write A. Explain why that makes
-> O(kA) pseudo-polynomial.
+**Setup.** We fixed D = {1, 5, 12, 19} (k = 4). It includes 1, so every amount is reachable and
+the whole table is used. Greedy fails on it (A = 15: greedy 12+1+1+1, best 5+5+5). We doubled A from 2^8 to 2^22 (15 steps). For each A we ran `bottom_up` once with
+counters on to get the states processed, then timed it separately (median of 7 runs, counters
+off). Same machine as Section 2.5.
 
-![Figure 3: Bottom-up runtime vs bit length of A (log y)](results/exp2_pseudo_polynomial.png)
+**Results.** States processed was exactly A + 1 every time, so each doubling of A doubles the
+work. Each doubling multiplied the runtime by 1.7× to 2.9× (median 2.0×), and time per state
+stayed between 235 and 423 ns. So time is a straight line against A (Figure 3a), and also against
+bit length on a log axis (Figure 3b): each extra bit doubles the time.
 
-**Figure 3.** _caption._ Data: `results/exp2_pseudo_polynomial.csv`.
+**Interpretation.** The input size of a number is the bits needed to write it, b = ⌊log2 A⌋ + 1,
+not its value. So O(kA) = O(k · 2^b). That's linear in the value of A but exponential in the
+input length, which is what pseudo-polynomial means. Here, going from 9 bits to 23 bits (an
+input only 14 bits longer) multiplied the runtime by about 24,000×.
 
-**Table 6.** Pseudo-polynomial scaling.
+![Figure 3: Bottom-up runtime vs A and vs bit length of A](results/exp2_pseudo_polynomial.png)
 
-| A | Bit length | States processed | Median time (s) |
-|---|---|---|---|
-| 256 | 9 | _ | _ |
-| _ | _ | _ | _ |
+**Figure 3.** Bottom-up DP on D = {1, 5, 12, 19}, A = 2^8 to 2^22, median of 7 runs. (a) Time vs
+A is linear. (b) Time vs bit length on a log2 axis is a straight line, so time doubles with each
+extra bit. Data: `results/exp2_pseudo_polynomial.csv`.
+
+**Table 6.** Pseudo-polynomial scaling (selected rows; all 15 are in the CSV).
+
+| A | Bit length | States processed | Median time (s) | Time per state (ns) |
+|---|---|---|---|---|
+| 256 | 9 | 257 | 0.0000605 | 235 |
+| 4,096 | 13 | 4,097 | 0.00122 | 297 |
+| 65,536 | 17 | 65,537 | 0.0277 | 423 |
+| 1,048,576 | 21 | 1,048,577 | 0.350 | 334 |
+| 2,097,152 | 22 | 2,097,153 | 0.734 | 350 |
+| 4,194,304 | 23 | 4,194,305 | 1.46 | 348 |
 
 ---
 
@@ -244,7 +278,11 @@ stopped after it passed the 10^7-call cutoff at A = 34. Data: `results/exp1_repe
 Brute force redundantly checks all $\binom{n}{2} = \Theta(n^2)$ pairs one by one. Divide and conquer avoids this pairwise search during the merge step by exploiting the sorted order of each half. When a right-half element $R[j]$ is smaller than a left-half element $L[i]$, it is guaranteed to be smaller than all remaining elements $L[i \dots |L|-1]$. Instead of doing $|L| - i$ separate comparisons, the algorithm counts all $|L| - i$ inversions in a single $O(1)$ arithmetic addition.
 
 **Q2. Why are inversion subproblems independent before the merge, while coin-change subproblems overlap heavily?**
-> TODO(P3) · ~80 words.
+Inversion subproblems are disjoint slices of the array: the two halves share no elements, so no
+subarray is solved twice and the recursion makes only about 2n calls. Coin-change subproblems are
+amounts, and many coin orders reach the same amount: with D = {1, 3, 4}, taking 4, or 3 then 1,
+or 1 then 3 all reach A − 4. At A = 34, naive recursion made 17,480,760 calls on only 35 distinct
+amounts (Section 3.5). Bottom-up solves each amount once.
 
 **Q3. What role does sorting play in the divide-and-conquer improvement?**
 Sorting is the mechanism that enables batch counting of cross inversions. By maintaining the invariant that recursive calls return sorted subarrays, the merge step can infer relative order across multiple pairs by transitivity. If the halves were unsorted, seeing $L[i] > R[j]$ would tell us nothing about whether subsequent left elements exceed $R[j]$, forcing an exhaustive pairwise check of $\Theta(n^2)$. Sorting costs only $\Theta(n \log n)$ overall while reducing merge comparisons from quadratic to linear $\Theta(n)$.
@@ -270,6 +308,12 @@ took 1.70 s and memo took 9.7 µs (Section 3.5).
 > until the merge. Try dynamic programming when a natural recursion keeps reaching the same
 > subproblems, like coin change: at A = 34, naive recursion made 17,480,760 calls but reached only 35
 > distinct amounts (Section 3.5).
+>
+> **P3 draft:** Try divide and conquer when the input splits into disjoint pieces and the real work
+> is a combine step that can use structure from the pieces, like the sorted halves in the merge.
+> Try dynamic programming when the subproblems are indexed by a small set of values, like amounts
+> 0 to A, that many recursion paths reach; but check that set's size, since O(kA) is only
+> pseudo-polynomial and doubles with every extra bit of A (Section 3.6).
 
 ---
 
@@ -281,7 +325,7 @@ _Separate deliverable; doesn't count toward the page limit._
 |---|---|---|
 | Solomon Canoy | P1: Inversions | Implemented `brute_force`, `merge_and_count`, and `sort_and_count` in `inversions.py`; expanded `test_inversions.py` with 12 hand-checked cases and verified 200 random trials; authored Report Sections 2.1–2.4 (Table 1), Reflection Q1, Q3, and Q6 draft. |
 | Ryly Dou | P2: Recursive coin solvers | `greedy`, `naive`, and `memo` solvers with call counters; Experiment 1 (script, CSV, Figure 2); Report 3.1, 3.2 (greedy, naive, memo), 3.5, and Q4 |
-| _________ | P3: Bottom-up DP + timing | _ |
+| Prajit | P3: Bottom-up DP + timing | `bottom_up` with coin-list rebuild and `states_processed` counter, plus extra tests in `test_bottom_up.py`; inversion benchmark (script, CSV, Figure 1, crossover); Experiment 2 (script, CSV, Figure 3, Table 6); README setup, machine, and reproduce steps; Report 2.5, 3.1 and 3.2 (bottom-up), 3.6, Q2, and Q6 draft |
 | _________ | P4: Coin checker + integrator | _ |
 
 ## AI Use Statement
