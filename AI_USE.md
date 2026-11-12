@@ -11,9 +11,12 @@ Delete this comment and the TODO lines before submitting.
 
 ## Summary
 
-> TODO(P4) · 2–4 sentences. Which tools the group used, what for in general, and the main way we
-> verified their output (independent baselines, hand-checked cases, seeded random cross-checks,
-> reviewing derivations by hand).
+All four members used generative AI: Claude Code (Claude Opus 5.5) for the project setup, P2, P3,
+and P4, and Antigravity (Gemini 3.8 Flash) for P1. It wrote most of the code, tests, and experiment
+scripts, and first drafts of the report sections. We did not treat its output as evidence of
+correctness. Each fast algorithm was checked against a separately written slow baseline (brute
+force for inversions; naive recursion and a BFS answer key for coins) on hand-checked and seeded
+random inputs, and every number in the report was compared with our own CSVs.
 
 ## Tools Used
 
@@ -23,6 +26,7 @@ Delete this comment and the TODO lines before submitting.
 | Claude Code (Claude Opus 5.5) | Ryly Dou | P2: coin solvers (greedy, naive, memo), Experiment 1, report sections 3.1, 3.2, 3.5, Q4, and the Q6 draft |
 | Antigravity (Gemini 3.8 Flash) | Solomon Canoy | P1: inversions implementation, test case expansion, report sections 2.1–2.4, Q1, Q3, and Q6 draft |
 | Claude Code (Claude Opus 5.5) | Prajit | P3: bottom-up solver and tests, inversion benchmark, Experiment 2, README, report sections 2.5, 3.1–3.2 (bottom-up), 3.6, Q2, and the Q6 draft |
+| Claude Code (Claude Opus 5.5) | Micky Sheridan | P4: `is_valid`, hand cases, validator and counterexample tests, greedy counterexample search, report sections 1, 3.3, 3.4, Q5, the Q6 merge, and the final merge |
 
 ## Contributions and Verification
 
@@ -40,14 +44,11 @@ One row per meaningful use. Say what the AI produced, what a human changed, and 
 | Prajit | P3: `exp2_pseudo_polynomial.py`, `results/exp2_pseudo_polynomial.*` | Script (D = {1, 5, 12, 19}, A = 2^8..2^22), CSV, and two-panel plot | Repeats raised from 5 to 7 after a noisy point (see below) | Checked from the CSV that states_processed = A + 1 in every row, and computed the time ratio for each doubling (1.7× to 2.9×). Found the greedy failure quoted for this D (A = 15) by running `greedy` against `bottom_up`. Looked over Figure 3: (a) is a straight line, and (b) rises steadily with each bit |
 | Prajit | P3: report sections 2.5, 3.1 and 3.2 (bottom-up, Table 2 row), 3.6, Table 6, Figure 1 and 3 captions, Q2, Q6 draft; `README.md` | Section text, complexity row, captions, README machine table and reproduce steps | Reworded 2.5, 3.1, 3.6, Q2, and the Q6 draft in the final report (numbers unchanged) | Compared every number in the text and in Tables 2 and 6 with `results/benchmark_inversions.csv` and `results/exp2_pseudo_polynomial.csv`. Re-derived the bottom-up bounds by hand: the outer loop runs A + 1 times and the inner loop k times, so Θ(kA) time; best[] and choice[] each hold A + 1 entries, so Θ(A) space. Reread all the sections |
 | Solomon Canoy | P1: `src/inversions.py`, `src/test_inversions.py`, `REPORT.md` | Initial code for `brute_force`, `merge_and_count`, and `sort_and_count`; additional test cases; report sections 2.1–2.4, Q1, and Q3 drafts | Reviewed and verified algorithm logic, adjusted inductive proof, formatted Table 1, and ensured word targets | Ran pytest suite (27 passed: 12 hand-checked arrays and 200 random arrays); verified against assignment rubric |
-
-## Members Who Used No Generative AI
-
-> TODO · List names, or delete this section if everyone used AI.
+| Micky Sheridan | P4: `validate.py`, `coin_cases.py`, `test_validate.py` | `is_valid`; 4 new hand cases ({2, 3, 4} A = 6, {4, 7} A = 17, {1, 7, 10} A = 14, and unsorted {5, 1, 2} A = 11), for 12 total; 2 new test functions and 4 new `is_valid` asserts | Nothing so far | `pytest`: 79 passed. All 12 hand answers matched the BFS answer key in `coin_cases.py`. Mutation check: planted 8 bugs in a scratch copy of `src/` (`==` changed to `<=` or `>=` in the sum and count checks, no coin-in-D check, an off-by-one target range, `>` changed to `>=`, no skip when greedy is stuck); after one extra assert was added (see below), the tests caught all 8. TODO(P4): hand-check the 4 new cases and the 8 from setup |
+| Micky Sheridan | P4: `counterexamples.py`, `results/counterexamples.csv` | `find_counterexamples` and the search script (32 coin systems × A = 0..50, CSV, printed summary) | Nothing so far | Ran it: 322 counterexamples in 25 of 32 systems, including D = {1, 3, 4}, A = 6, and none for US coins. A separate script re-checked every CSV row against the BFS answer key (coins sum to A, counts match list lengths, coins come from D, greedy count > BFS optimum = optimal count), and a recount over all 1,632 cases using `greedy` and the BFS key also gave 322. TODO(P4): hand-check the four Table 4 rows |
+| Micky Sheridan | P4: `REPORT.md` 1, 3.3, 3.4, Tables 3 and 4, Q5, merged Q6; final merge | Section text and tables; Q6 merged from the P1–P3 drafts; final merge (team line, Contribution row, removing the skeleton notes and TODO blocks) | Nothing so far | Table 3 was filled from a run of naive, memo, and bottom-up on every hand case, not copied from the expected column. Every number in 3.3, 3.4, Q5, and Table 4 was compared with the solver output and `results/counterexamples.csv`. Checked that P1's "200 arrays, n from 0 to 60" (Section 2.4) matches `test_inversions.py`. TODO(P4): reread every section |
 
 ## Limitations and Errors Caught
-
-> TODO · Optional but useful: any wrong or misleading AI output we found, and how we caught it.
 
 - P2, Experiment 1: the first version timed one run with the counters on. One memo point (A = 40)
   came out more than 60× slower than the points on either side of it. The timing was changed to the median of 3
@@ -59,3 +60,7 @@ One row per meaningful use. Say what the AI produced, what a human changed, and 
   about 300 ns for its neighbors). Repeats were raised to 7 to match the inversion benchmark, and
   the next run was kept as it came out. It has its own high point (A = 65,536 at 423 ns per state),
   which is reported as measured.
+- P4, `test_validate.py`: the `is_valid` tests had no case where the count was too small but the
+  coins were otherwise fine (the one short-count case, `[3, 3, 0]`, also had a coin not in D). A
+  mutation check showed that a validator accepting too-small counts still passed every test. An
+  assert with that exact case (`(1, [3, 3])` for A = 6) was added, and the planted bug now fails.

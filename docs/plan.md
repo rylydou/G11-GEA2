@@ -49,7 +49,7 @@ Also own the README.
 - [x] Report 3.1 and 3.2 (bottom-up), 2.5: runtime, and 3.6: Exp 2
 - [x] Reflection Q2
 
-## P4: Coin Checker + Integrator · Name: _________
+## P4: Coin Checker + Integrator · Name: Micky Sheridan
 
 Write the answer checker and the shared coin test cases. Then cross-check all the exact solvers
 and search for cases where greedy fails. Finally, merge the report.
@@ -57,13 +57,13 @@ and search for cases where greedy fails. Finally, merge the report.
 **Owns:** `validate.py`, `coin_cases.py`, `test_validate.py`, `counterexamples.py`, `REPORT.md` (final merge), `AI_USE.md` (final merge)
 **Waits on:** P2 and P3 solvers for the cross-check and counterexamples; everyone for the merge
 
-- [ ] `is_valid` (coins sum to A, the count matches, every coin is in D)
-- [ ] 10+ hand cases in `coin_cases.py` (target 0, impossible, multiple optimal answers)
-- [ ] **Wait on: P2 + P3** · 100+ random cross-checks pass (`naive`, `memo`, `bottom_up` agree)
-- [ ] **Wait on: P2 + P3** · counterexample search (`greedy` vs `bottom_up`) finds `D={1,3,4}, A=6`, plus 3+ shown, with one explained
-- [ ] Report 1: Introduction, 3.3: validation (Table 3), and 3.4: counterexamples (Table 4)
-- [ ] Reflection Q5
-- [ ] **Wait on: everyone** · merge Q6
+- [x] `is_valid` (coins sum to A, the count matches, every coin is in D)
+- [x] 10+ hand cases in `coin_cases.py` (target 0, impossible, multiple optimal answers)
+- [x] **Wait on: P2 + P3** · 100+ random cross-checks pass (`naive`, `memo`, `bottom_up` agree)
+- [x] **Wait on: P2 + P3** · counterexample search (`greedy` vs `bottom_up`) finds `D={1,3,4}, A=6`, plus 3+ shown, with one explained
+- [x] Report 1: Introduction, 3.3: validation (Table 3), and 3.4: counterexamples (Table 4)
+- [x] Reflection Q5
+- [x] **Wait on: everyone** · merge Q6
 - [ ] **Wait on: everyone** · final `REPORT.md` merged (8 pages max, no `TODO(` left) and `AI_USE.md` merged
 
 ## Shared

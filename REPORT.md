@@ -1,30 +1,18 @@
 # From Brute Force to Better Algorithms: Divide and Conquer + Dynamic Programming
 
 **CMP_SC 4050: Group Algorithm Engineering Assignment 2** · Fall 2026
-**Team:** _________, _________, _________, _________ · **Submitted:** _________
-
-<!--
-HOW TO USE THIS SKELETON
-- Each "> TODO(P#)" block says who writes that section, what to cover, and how long to make it.
-  Replace the block with your text, and delete all TODO blocks before submitting.
-- Find what's left with:  grep -n "TODO(" REPORT.md
-- PAGE LIMIT: the assignment asks for about 6-8 pages. Treat 8 pages as the hard cap.
-  Budget: about 2,600 words + 3 figures + 5 small tables, which comes to about 7 pages.
-  Stay within your section's word target. Check the page count in the final PDF.
-- Use only numbers from our own results/*.csv files. Never estimate or make up a result.
-- Testing doesn't prove correctness. Say tests "agreed on all N tested inputs", and use the
-  correctness arguments for the general claim.
-- The Contribution Statement (end of this file) and AI_USE.md are separate deliverables,
-  so they don't count toward the page limit.
--->
+**Team:** Solomon Canoy, Ryly Dou, Prajit, Micky Sheridan · **Submitted:** November 12, 2026
 
 ## 1. Introduction
 
-> **TODO(P4) · ~120 words.** Explain the theme: two correct but slow baselines, each improved by a
-> different paradigm. Divide and conquer takes inversion counting from Θ(n²) to Θ(n log n).
-> Dynamic programming removes repeated work in coin change. Briefly list what we did:
-> implement, validate against baselines, benchmark, explain. Give the language and version,
-> and point to the README for how to reproduce the results.
+This report follows one idea twice: start from a correct but slow baseline, then build a faster
+algorithm that gives the same answers. In Part I, divide and conquer takes inversion counting from
+Θ(n²) to Θ(n log n) by counting cross inversions in bulk during the merge. In Part II, dynamic
+programming removes the repeated work of naive recursion in coin change, and we search for cases
+where the greedy heuristic fails. For each part we implemented the algorithms, checked the fast
+versions against the slow ones on hand-checked and seeded random inputs, measured how they scale,
+and explained the results. The code is Python 3.10+ with matplotlib and pytest. The README lists
+the machine, Python version, and exact commands behind every table and figure.
 
 ---
 
@@ -169,35 +157,66 @@ each: Θ(kA) time. The best and choice tables use Θ(A) space.
 
 ### 3.3 Exact-Solver Validation
 
-> **TODO(P4) · ~150 words + Table 3.** Describe the 10+ hand cases (target 0, impossible, multiple
-> optimal solutions), the 100+ seeded random instances where naive, memo, and bottom-up must agree,
-> and the independent `is_valid` check (coins sum to A, count matches, coins come from D).
-> State the outcome.
+Before using bottom-up DP to judge greedy, we checked the three exact solvers against each other
+(`src/test_validate.py`).
+
+**Hand cases.** `coin_cases.py` has 12 cases with answers worked out by hand (Table 3): target 0,
+three IMPOSSIBLE cases, two with more than one optimal answer, three where greedy is wrong or
+stuck, and one with D out of order. A breadth-first search (`reference_count`), written separately
+from every solver, gives the same 12 answers.
+
+**Random cases.** 100 seeded instances (seed 4050), with 1–4 coins up to 10 and A from 0 to 20.
+20 have no 1-coin, and 3 are IMPOSSIBLE.
+
+**Outcome.** Naive, memo, and bottom-up returned the expected count on all 12 hand cases and
+agreed on all 100 random instances. `is_valid` checked every returned answer on its own: the count
+equals the list length, the coins sum to A, and every coin is in D. All passed. This shows
+agreement on the inputs we tried; the general claim rests on the recurrence argument in Section 3.1.
 
 **Table 3.** Hand-checked coin cases (from `src/coin_cases.py`).
 
 | D | A | Expected | Naive | Memo | Bottom-up | Why it's included |
 |---|---|---|---|---|---|---|
-| {1, 2, 5} | 0 | 0 | _ | _ | _ | target 0 |
-| {2} | 3 | IMPOSSIBLE | _ | _ | _ | impossible |
-| {1, 2, 3} | 4 | 2 | _ | _ | _ | multiple optimal (1+3, 2+2) |
-| {1, 3, 4} | 6 | 2 | _ | _ | _ | greedy counterexample |
-| _add the rest (10+ total)_ | | | | | | |
+| {1, 2, 5} | 0 | 0 | 0 | 0 | 0 | target 0 |
+| {1, 5, 10, 25} | 30 | 2 | 2 | 2 | 2 | US coins: 25+5 |
+| {1, 2, 5} | 11 | 3 | 3 | 3 | 3 | 5+5+1 |
+| {5, 1, 2} | 11 | 3 | 3 | 3 | 3 | D not sorted |
+| {2} | 3 | IMPOSSIBLE | IMPOSSIBLE | IMPOSSIBLE | IMPOSSIBLE | odd A, only 2s |
+| {5, 10} | 3 | IMPOSSIBLE | IMPOSSIBLE | IMPOSSIBLE | IMPOSSIBLE | A below every coin |
+| {4, 7} | 17 | IMPOSSIBLE | IMPOSSIBLE | IMPOSSIBLE | IMPOSSIBLE | 17, 10, 3 not multiples of 4 |
+| {1, 2, 3} | 4 | 2 | 2 | 2 | 2 | two optima: 1+3, 2+2 |
+| {2, 3, 4} | 6 | 2 | 2 | 2 | 2 | two optima: 2+4, 3+3 |
+| {1, 3, 4} | 6 | 2 | 2 | 2 | 2 | greedy 4+1+1; best 3+3 |
+| {1, 7, 10} | 14 | 2 | 2 | 2 | 2 | greedy 10+1+1+1+1; best 7+7 |
+| {3, 5} | 9 | 3 | 3 | 3 | 3 | greedy stuck; best 3+3+3 |
 
 ### 3.4 Greedy Counterexamples
 
-> **TODO(P4) · ~200 words + Table 4.** Explain how the automated search works (which coin systems,
-> which targets, compared against bottom-up DP) and how many cases it found. Show 3+ distinct
-> counterexamples. For at least one, explain the structure: why taking the largest coin first
-> blocks a better overall combination.
+**Search.** `counterexamples.py` compares greedy with bottom-up DP on every A from 0 to 50 for 32
+coin systems: {1, 3, 4}, US coins {1, 5, 10, 25} as a control, and 30 distinct seeded random
+systems (seed 4050), each with a 1-coin plus 2 or 3 coins up to 20. A case counts when greedy
+returns a valid answer with more coins than the optimum. Cases where greedy gets stuck
+(Section 3.1) are skipped, and both answers must pass `is_valid`.
 
-**Table 4.** Greedy counterexamples (from `results/counterexamples.csv`).
+**Results.** Of the 1,632 cases, 322 were counterexamples, in 25 of the 32 systems. They include
+the required D = {1, 3, 4}, A = 6. US coins had none. Table 4 shows the smallest for four systems.
+The largest gap was D = {1, 16, 17, 18}, A = 33: greedy used 16 coins (18 and fifteen 1s), the
+optimum 2 (17+16).
+
+**Why greedy fails.** For D = {1, 3, 4}, A = 6, greedy takes 4 because it is the largest coin that
+fits. That leaves 2, which only 1+1 can make, so greedy uses 3 coins, while 3+3 uses 2. Greedy
+judges each coin only by what it removes now and never undoes a choice, so it can't see that a
+smaller first coin leaves a remainder the other coins fill exactly. Every row of Table 4 has this
+shape: the largest coin leaves a small remainder that only 1-coins can fill.
+
+**Table 4.** Greedy counterexamples, the smallest A for each system (from `results/counterexamples.csv`).
 
 | D | A | Greedy coins (count) | Optimal coins (count) |
 |---|---|---|---|
 | {1, 3, 4} | 6 | 4+1+1 (3) | 3+3 (2) |
-| _ | _ | _ | _ |
-| _ | _ | _ | _ |
+| {1, 6, 10} | 12 | 10+1+1 (3) | 6+6 (2) |
+| {1, 5, 11} | 15 | 11+1+1+1+1 (5) | 5+5+5 (3) |
+| {1, 7, 16, 19} | 23 | 19+1+1+1+1 (5) | 16+7 (2) |
 
 ### 3.5 Experiment 1: Repeated Subproblems
 
@@ -270,10 +289,6 @@ extra bit. Data: `results/exp2_pseudo_polynomial.csv`.
 
 ## 4. Cross-Paradigm Reflection
 
-> **~500 words total, about 80 per question.** Answer every question with specific evidence from
-> our results (numbers, counterexamples, figures). Sections 2 and 3 already cover the detail, so
-> refer back to them instead of repeating it.
-
 **Q1. What work does divide and conquer avoid compared with checking every pair?**
 Brute force redundantly checks all $\binom{n}{2} = \Theta(n^2)$ pairs one by one. Divide and conquer avoids this pairwise search during the merge step by exploiting the sorted order of each half. When a right-half element $R[j]$ is smaller than a left-half element $L[i]$, it is guaranteed to be smaller than all remaining elements $L[i \dots |L|-1]$. Instead of doing $|L| - i$ separate comparisons, the algorithm counts all $|L| - i$ inversions in a single $O(1)$ arithmetic addition.
 
@@ -295,25 +310,20 @@ Memo's work follows the number of distinct states times k, which is O(kA). That 
 took 1.70 s and memo took 9.7 µs (Section 3.5).
 
 **Q5. How did the baseline and exact implementations help validate the faster algorithms in both halves?**
-> TODO(P4) · ~80 words.
+In both halves the slow version is simple enough to check by reading it, so it served as the
+answer key. Brute force checked `sort_and_count` on 12 hand arrays and 200 random ones
+(Section 2.4). Naive recursion copies the coin recurrence directly, and it agreed with memo and
+bottom-up on 12 hand cases and 100 random instances (Section 3.3), with a separate BFS answer key
+and `is_valid` as extra checks. Only then did we trust bottom-up to judge greedy (Section 3.4).
 
 **Q6. For a new optimization problem, what evidence would make you try divide and conquer first? What would make you try dynamic programming?**
-> TODO(everyone drafts 1–2 sentences; P4 merges) · ~100 words. Contrast independent subproblems
-> with overlapping ones.
->
-> **P1 draft:** Choose divide and conquer when the problem decomposes into disjoint, independent subproblems whose results can be combined efficiently without sharing state. Choose dynamic programming when subproblems overlap heavily and evaluate identical state transitions repeatedly.
->
-> **P2 draft:** Try divide and conquer first when the problem splits into parts that can be solved
-> on their own and combined cheaply, like the two halves in inversion counting, which share nothing
-> until the merge. Try dynamic programming when a natural recursion keeps reaching the same
-> subproblems, like coin change: at A = 34, naive recursion made 17,480,760 calls but reached only 35
-> distinct amounts (Section 3.5).
->
-> **P3 draft:** Try divide and conquer when the input splits into disjoint pieces and the real work
-> is a combine step that can use structure from the pieces, like the sorted halves in the merge.
-> Try dynamic programming when the subproblems are indexed by a small set of values, like amounts
-> 0 to A, that many recursion paths reach; but check that set's size, since O(kA) is only
-> pseudo-polynomial and doubles with every extra bit of A (Section 3.6).
+Try divide and conquer first when the input splits into disjoint parts that can be solved on their
+own, and the real work is a cheap combine step that can use structure from the parts, like the
+sorted halves in the merge. Try dynamic programming when a natural recursion keeps reaching the
+same subproblems, indexed by a small set of values: at A = 34, naive recursion made 17,480,760
+calls but reached only 35 distinct amounts (Section 3.5). Check how big that set is first. Coin
+change has A + 1 states, so O(kA) is only pseudo-polynomial and doubles with every extra bit of A
+(Section 3.6).
 
 ---
 
@@ -326,7 +336,7 @@ _Separate deliverable; doesn't count toward the page limit._
 | Solomon Canoy | P1: Inversions | Implemented `brute_force`, `merge_and_count`, and `sort_and_count` in `inversions.py`; expanded `test_inversions.py` with 12 hand-checked cases and verified 200 random trials; authored Report Sections 2.1–2.4 (Table 1), Reflection Q1, Q3, and Q6 draft. |
 | Ryly Dou | P2: Recursive coin solvers | `greedy`, `naive`, and `memo` solvers with call counters; Experiment 1 (script, CSV, Figure 2); Report 3.1, 3.2 (greedy, naive, memo), 3.5, and Q4 |
 | Prajit | P3: Bottom-up DP + timing | `bottom_up` with coin-list rebuild and `states_processed` counter, plus extra tests in `test_bottom_up.py`; inversion benchmark (script, CSV, Figure 1, crossover); Experiment 2 (script, CSV, Figure 3, Table 6); README setup, machine, and reproduce steps; Report 2.5, 3.1 and 3.2 (bottom-up), 3.6, Q2, and Q6 draft |
-| _________ | P4: Coin checker + integrator | _ |
+| Micky Sheridan | P4: Coin checker + integrator | `is_valid` in `validate.py`; 12 hand-checked cases in `coin_cases.py`; new validator and counterexample tests in `test_validate.py`; automated greedy counterexample search (`counterexamples.py`, CSV, Table 4); Report 1, 3.3 (Table 3), 3.4 (Table 4), Q5, and the merged Q6; final merge of `REPORT.md` and `AI_USE.md` |
 
 ## AI Use Statement
 
